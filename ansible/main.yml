@@ -1,0 +1,32 @@
+---
+- hosts: web #all
+  tasks:
+    - name: "Instalar Apache"
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+        name: ["apache2"]
+        state: latest
+      become: yes
+    
+    - name: "Garantir serviço Apache rodando"
+      service:
+        name: apache2
+        state: started
+        enabled: True
+      become: yes
+
+    - name: "Copiar nova página"
+      copy:
+        src: "~/ansible/index.html"
+        dest: "/var/www/html/index.html"
+      become: yes
+      notify:
+        - restart apache
+
+  handlers:
+    - name: restart apache
+      service:
+        name: apache2
+        state: restarted
+      become: yes
